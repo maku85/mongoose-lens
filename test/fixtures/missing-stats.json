@@ -1,0 +1,6 @@
+{
+  "queryPlanner": {
+    "plannerVersion": 1,
+    "namespace": "test.users"
+  }
+}

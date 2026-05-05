@@ -1,0 +1,22 @@
+{
+  "executionStats": {
+    "nReturned": 50,
+    "totalDocsExamined": 50,
+    "executionTimeMillis": 210,
+    "executionStages": {
+      "stage": "SORT",
+      "memLimit": 104857600,
+      "inputStage": {
+        "stage": "FETCH",
+        "docsExamined": 50,
+        "inputStage": {
+          "stage": "IXSCAN",
+          "keyPattern": { "status": 1 },
+          "indexName": "status_1",
+          "direction": "forward",
+          "keysExamined": 50
+        }
+      }
+    }
+  }
+}

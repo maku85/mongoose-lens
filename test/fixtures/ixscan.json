@@ -1,0 +1,18 @@
+{
+  "executionStats": {
+    "nReturned": 10,
+    "totalDocsExamined": 10,
+    "executionTimeMillis": 2,
+    "executionStages": {
+      "stage": "FETCH",
+      "docsExamined": 10,
+      "inputStage": {
+        "stage": "IXSCAN",
+        "keyPattern": { "status": 1 },
+        "indexName": "status_1",
+        "direction": "forward",
+        "keysExamined": 10
+      }
+    }
+  }
+}

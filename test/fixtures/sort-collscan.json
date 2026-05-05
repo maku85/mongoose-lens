@@ -1,0 +1,16 @@
+{
+  "executionStats": {
+    "nReturned": 100,
+    "totalDocsExamined": 100,
+    "executionTimeMillis": 260,
+    "executionStages": {
+      "stage": "SORT",
+      "memLimit": 104857600,
+      "inputStage": {
+        "stage": "COLLSCAN",
+        "direction": "forward",
+        "docsExamined": 100
+      }
+    }
+  }
+}

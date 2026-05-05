@@ -1,0 +1,26 @@
+{
+  "executionStatsByShardName": {
+    "shard1": {
+      "executionStats": {
+        "nReturned": 5,
+        "totalDocsExamined": 25000,
+        "executionTimeMillis": 300,
+        "executionStages": {
+          "stage": "COLLSCAN",
+          "direction": "forward"
+        }
+      }
+    },
+    "shard2": {
+      "executionStats": {
+        "nReturned": 3,
+        "totalDocsExamined": 20000,
+        "executionTimeMillis": 450,
+        "executionStages": {
+          "stage": "COLLSCAN",
+          "direction": "forward"
+        }
+      }
+    }
+  }
+}

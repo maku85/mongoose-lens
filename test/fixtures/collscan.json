@@ -1,0 +1,12 @@
+{
+  "executionStats": {
+    "nReturned": 1,
+    "totalDocsExamined": 50000,
+    "executionTimeMillis": 450,
+    "executionStages": {
+      "stage": "COLLSCAN",
+      "direction": "forward",
+      "docsExamined": 50000
+    }
+  }
+}
