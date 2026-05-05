@@ -32,7 +32,9 @@ function stableStringify(value: unknown): string {
 }
 
 export function buildDedupeKey(model: string, filter: Record<string, unknown>): string {
-  return `${model}::${stableStringify(filter)}`;
+  // Wrap in array so special characters in model names cannot produce the same
+  // key as a different (model, filter) pair via separator injection.
+  return stableStringify([model, filter]);
 }
 
 // ---------------------------------------------------------------------------

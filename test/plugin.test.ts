@@ -135,7 +135,14 @@ describe("automatic query interception", () => {
       mongooseLens({
         thresholds: { executionTimeMs: 99_999, docsExamined: 99_999, ratio: 99_999 },
         sampling: { rate: 1 },
-        transport: [{ type: "custom", handler: (r) => { reports.push(r); } }],
+        transport: [
+          {
+            type: "custom",
+            handler: (r) => {
+              reports.push(r);
+            },
+          },
+        ],
       }),
     );
     const M = mongoose.model("NoReport", schema);
@@ -179,7 +186,14 @@ describe("circuit breaker", () => {
         sampling: { rate: 1 },
         circuitBreaker: { maxExplainsPerWindow: 2, windowMs: 60_000 },
         deduplication: { windowMs: 0 }, // disable dedup to test breaker alone
-        transport: [{ type: "custom", handler: (r) => { reports.push(r); } }],
+        transport: [
+          {
+            type: "custom",
+            handler: (r) => {
+              reports.push(r);
+            },
+          },
+        ],
       }),
     );
     const M = mongoose.model("CB", schema);
@@ -210,7 +224,14 @@ describe("deduplication", () => {
         thresholds: { executionTimeMs: 0, docsExamined: 0, ratio: 0 },
         sampling: { rate: 1 },
         deduplication: { windowMs: 60_000 },
-        transport: [{ type: "custom", handler: (r) => { reports.push(r); } }],
+        transport: [
+          {
+            type: "custom",
+            handler: (r) => {
+              reports.push(r);
+            },
+          },
+        ],
       }),
     );
     const M = mongoose.model("Dedup", schema);
@@ -222,6 +243,41 @@ describe("deduplication", () => {
     await M.find({ status: "active" });
     await flushAsync(500);
 
+    expect(reports).toHaveLength(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// .skipLens() opt-out helper
+// ---------------------------------------------------------------------------
+
+describe(".skipLens() query helper", () => {
+  it("suppresses the automatic LensReport for the skipped query", async () => {
+    const reports: Array<LensReport> = [];
+    const User = makeUserModel((r) => reports.push(r));
+
+    await User.create({ name: "Skip", status: "active", age: 20 });
+
+    // Skipped query — should produce no report
+    await User.find({ status: "active" }).skipLens();
+    await flushAsync(300);
+
+    expect(reports).toHaveLength(0);
+  });
+
+  it("only suppresses the query it is called on", async () => {
+    const reports: Array<LensReport> = [];
+    const User = makeUserModel((r) => reports.push(r), {
+      deduplication: { windowMs: 0 },
+    });
+
+    await User.create({ name: "Skip2", status: "active", age: 21 });
+
+    await User.find({ status: "active" }).skipLens();
+    await User.find({ status: "active" });
+    await flushAsync(500);
+
+    // Only the second query should produce a report
     expect(reports).toHaveLength(1);
   });
 });

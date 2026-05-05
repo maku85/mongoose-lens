@@ -19,4 +19,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Non-blocking async explain queue (`setImmediate` + bounded concurrency)
 - Three built-in transports: `console`, `json` (JSONL), `custom`
 - On-demand `.lens()` query helper that returns a `LensReport` without executing the query as a data fetch
+- `.skipLens()` query helper to opt a specific query out of automatic lens analysis
+- `advice: 'both'` mode documented (human-readable text + raw explain in `LensReport.raw`)
 - Dual ESM + CJS output with full TypeScript declarations

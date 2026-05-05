@@ -141,6 +141,7 @@ describe("buildAdvice", () => {
     const explain = normalizeExplain(collscan as MongoExplainDocument, false);
     const advice = buildAdvice({
       model: "User",
+      collectionName: "users",
       operation: "find",
       filter: { status: "active" },
       explain,
@@ -159,6 +160,7 @@ describe("buildAdvice", () => {
     const explain = normalizeExplain(sortIxscan as MongoExplainDocument, false);
     const advice = buildAdvice({
       model: "Order",
+      collectionName: "orders",
       operation: "find",
       filter: { status: "pending" },
       sort: { createdAt: -1 },
@@ -176,6 +178,7 @@ describe("buildAdvice", () => {
     const explain = normalizeExplain(collscan as MongoExplainDocument, false);
     const advice = buildAdvice({
       model: "User",
+      collectionName: "users",
       operation: "find",
       filter: {},
       explain,
@@ -191,6 +194,7 @@ describe("buildAdvice", () => {
     const explain = normalizeExplain(collscan as MongoExplainDocument, false);
     const advice = buildAdvice({
       model: "User",
+      collectionName: "users",
       operation: "find",
       filter: { status: "active" },
       explain,
@@ -208,6 +212,7 @@ describe("buildAdvice", () => {
     const explain = normalizeExplain(ixscanHighRatio as MongoExplainDocument, false);
     const advice = buildAdvice({
       model: "Product",
+      collectionName: "products",
       operation: "find",
       filter: { category: "electronics" },
       explain,

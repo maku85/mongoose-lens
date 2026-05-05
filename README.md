@@ -67,8 +67,9 @@ mongooseLens({
   // Max simultaneous explain() calls in flight.
   explainConcurrency: 2,
 
-  // 'human' (default) — readable summary + details
-  // 'raw'   — empty text, only structured data (suggestedIndex etc.)
+  // 'human' (default) — readable summary + details text
+  // 'raw'   — empty text fields, LensReport.raw contains the full explain
+  // 'both'  — readable text AND LensReport.raw
   advice: 'human',
 
   transport: [
@@ -118,6 +119,17 @@ console.log(report.advice.indexCommand) // db.users.createIndex({"status":1,"cre
 ```
 
 `.lens()` runs `explain('executionStats')` directly — no sampling, dedup, or circuit-breaker gates apply. The query itself is **not** executed as a data fetch.
+
+## Per-query opt-out with `.skipLens()`
+
+Use `.skipLens()` to exclude a specific query from automatic lens analysis — useful for internal or system queries you do not want to monitor:
+
+```ts
+// This query will not trigger explain or emit any LensReport
+await User.findById(systemId).skipLens()
+```
+
+`.skipLens()` is chainable and returns the query unchanged. It only suppresses the automatic middleware; `.lens()` is unaffected.
 
 ## Custom transport
 

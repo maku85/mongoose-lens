@@ -4,7 +4,7 @@ import { buildReport } from "./engine/analyzer.js";
 import { normalizeExplain } from "./engine/explain.js";
 import { CircuitBreaker, DeduplicationCache, ExplainQueue } from "./engine/sampler.js";
 import { registerAggregateMiddleware } from "./middleware/aggregate.middleware.js";
-import { registerQueryMiddleware } from "./middleware/query.middleware.js";
+import { registerQueryMiddleware, skippedQueries } from "./middleware/query.middleware.js";
 import { createTransports, dispatch } from "./transports/dispatch.js";
 import type { LensConfig, ResolvedLensConfig } from "./types/config.types.js";
 import type { LensReport } from "./types/report.types.js";
@@ -59,6 +59,7 @@ async function runLensOnQuery(query: QueryShape, config: ResolvedLensConfig): Pr
   const options = query.getOptions();
   const sort = options.sort as Record<string, unknown> | undefined;
   const modelName = model.modelName;
+  const collectionName = model.collection.collectionName;
   const operation = query.op ?? "find";
 
   const rawExplain = await model.collection
@@ -76,6 +77,7 @@ async function runLensOnQuery(query: QueryShape, config: ResolvedLensConfig): Pr
 
   const advice = buildAdvice({
     model: modelName,
+    collectionName,
     operation,
     filter,
     sort,
@@ -126,12 +128,18 @@ export function mongooseLens(userConfig: LensConfig = {}): (schema: Schema) => v
     registerAggregateMiddleware(schema, deps);
 
     // .lens() — on-demand explain; bypasses all automatic gates.
+    // .skipLens() — opt-out: marks this query instance so the post-hook skips it.
     // Cast schema.query to any: Mongoose types it as {} which doesn't allow
     // adding arbitrary helper methods without a full generic chain.
-    (schema.query as Record<string, unknown>).lens = function (
-      this: QueryShape,
-    ): Promise<LensReport> {
+    const q = schema.query as Record<string, unknown>;
+
+    q.lens = function (this: QueryShape): Promise<LensReport> {
       return runLensOnQuery(this, config);
+    };
+
+    q.skipLens = function (this: object): object {
+      skippedQueries.add(this);
+      return this;
     };
   };
 }

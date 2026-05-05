@@ -34,6 +34,9 @@ const QUERY_OPS: Array<MongooseQueryMiddleware> = [
 
 const timers = new WeakMap<object, number>();
 
+/** Queries added here via .skipLens() will bypass lens analysis entirely. */
+export const skippedQueries = new WeakSet<object>();
+
 // ---------------------------------------------------------------------------
 // Shared deps interface
 // ---------------------------------------------------------------------------
@@ -53,7 +56,10 @@ interface QueryThis {
   getOptions(): Record<string, unknown>;
   model: {
     modelName: string;
-    collection: { find: (...a: Array<unknown>) => { explain: (v: string) => Promise<unknown> } };
+    collection: {
+      collectionName: string;
+      find: (...a: Array<unknown>) => { explain: (v: string) => Promise<unknown> };
+    };
   };
   op: string;
 }
@@ -71,6 +77,10 @@ export function registerQueryMiddleware(schema: Schema, deps: MiddlewareDeps): v
   });
 
   schema.post(QUERY_OPS, async function (this: QueryThis, _result: unknown) {
+    if (skippedQueries.has(this)) {
+      skippedQueries.delete(this);
+      return;
+    }
     const start = timers.get(this);
     timers.delete(this);
     if (start === undefined) return;
@@ -85,6 +95,7 @@ export function registerQueryMiddleware(schema: Schema, deps: MiddlewareDeps): v
     const sort = options.sort as Record<string, unknown> | undefined;
     const { model } = this;
     const modelName = model.modelName;
+    const collectionName = model.collection.collectionName;
     const operation = this.op ?? "unknown";
 
     const key = buildDedupeKey(modelName, filter);
@@ -121,6 +132,7 @@ export function registerQueryMiddleware(schema: Schema, deps: MiddlewareDeps): v
 
         const advice = buildAdvice({
           model: modelName,
+          collectionName,
           operation,
           filter,
           sort,
@@ -140,8 +152,11 @@ export function registerQueryMiddleware(schema: Schema, deps: MiddlewareDeps): v
         });
 
         await dispatch(report);
-      } catch {
+      } catch (err) {
         // Explain errors must never surface to the application.
+        process.stderr.write(
+          `[mongoose-lens] explain error on ${modelName}.${operation}: ${String(err)}\n`,
+        );
       }
     });
   });

@@ -53,5 +53,14 @@ declare module "mongoose" {
      * const report = await User.find({ status: 'active' }).lens()
      */
     lens(): Promise<LensReport>;
+
+    /**
+     * Opt this query out of automatic lens analysis.
+     * Useful for internal or system queries you do not want to monitor.
+     *
+     * @example
+     * await User.find({ _id: systemId }).skipLens()
+     */
+    skipLens(): this;
   }
 }

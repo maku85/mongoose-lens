@@ -132,10 +132,12 @@ export function buildIndexSpec(
 
 /**
  * Produce a ready-to-run createIndex shell command.
- * Uses the Mongoose model name to infer a collection name (lowercase + 's').
- * The caller should verify the actual collection name if it differs.
+ * `collectionName` must be the actual MongoDB collection name (e.g. from
+ * `model.collection.collectionName`), not the Mongoose model name.
  */
-export function buildIndexCommand(modelName: string, indexSpec: Record<string, 1 | -1>): string {
-  const collection = `${modelName.toLowerCase()}s`;
-  return `db.${collection}.createIndex(${JSON.stringify(indexSpec)}, { background: true })`;
+export function buildIndexCommand(
+  collectionName: string,
+  indexSpec: Record<string, 1 | -1>,
+): string {
+  return `db.${collectionName}.createIndex(${JSON.stringify(indexSpec)}, { background: true })`;
 }

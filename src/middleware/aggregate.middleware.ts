@@ -69,6 +69,7 @@ export function registerAggregateMiddleware(schema: Schema, deps: MiddlewareDeps
     // Use the model name from the Aggregate instance
     const model = (this as unknown as { model: Model<unknown> }).model;
     const modelName = model?.modelName ?? "Unknown";
+    const collectionName = model?.collection.collectionName ?? modelName.toLowerCase();
 
     const key = buildDedupeKey(modelName, filter);
     if (!shouldExplain(key, config, dedup, breaker)) return;
@@ -95,6 +96,7 @@ export function registerAggregateMiddleware(schema: Schema, deps: MiddlewareDeps
 
         const advice = buildAdvice({
           model: modelName,
+          collectionName,
           operation: "aggregate",
           filter,
           sort,
@@ -114,8 +116,11 @@ export function registerAggregateMiddleware(schema: Schema, deps: MiddlewareDeps
         });
 
         await dispatch(report);
-      } catch {
+      } catch (err) {
         // Explain errors must never surface to the application.
+        process.stderr.write(
+          `[mongoose-lens] explain error on ${modelName}.aggregate: ${String(err)}\n`,
+        );
       }
     });
   });

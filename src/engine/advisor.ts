@@ -14,6 +14,7 @@ import { computeRatio } from "./analyzer.js";
 
 export interface AdvisorInput {
   model: string;
+  collectionName: string;
   operation: string;
   filter: Record<string, unknown>;
   sort?: Record<string, unknown>;
@@ -34,7 +35,9 @@ export function buildAdvice(input: AdvisorInput): AdviceBlock {
 
   const filterFields = categorizeFilterFields(input.filter);
   const suggestedIndex = buildIndexSpec(filterFields, input.sort);
-  const indexCommand = suggestedIndex ? buildIndexCommand(input.model, suggestedIndex) : null;
+  const indexCommand = suggestedIndex
+    ? buildIndexCommand(input.collectionName, suggestedIndex)
+    : null;
 
   if (input.config.advice === "raw") {
     // Human text is suppressed — report will carry the raw explain instead.
