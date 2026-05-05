@@ -1,5 +1,9 @@
 # mongoose-lens
 
+[![CI](https://github.com/maku85/mongoose-lens/actions/workflows/ci.yml/badge.svg)](https://github.com/maku85/mongoose-lens/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/mongoose-lens)](https://www.npmjs.com/package/mongoose-lens)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 Slow query interceptor and index advisor for Mongoose 8+.
 
 Automatically runs `explain('executionStats')` on queries that exceed configurable thresholds, detects the dominant execution stage (COLLSCAN, SORT, high-ratio FETCH …), and suggests an optimal index following the **ESR rule** (Equality → Sort → Range).

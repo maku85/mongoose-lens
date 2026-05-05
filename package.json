@@ -43,7 +43,8 @@
     "lint": "biome check src test",
     "lint:fix": "biome check --write src test",
     "format": "biome format --write src test",
-    "prepublishOnly": "pnpm run build && pnpm test"
+    "prepublishOnly": "pnpm run build && pnpm test",
+    "release": "node scripts/release.js"
   },
   "peerDependencies": {
     "mongoose": "^8.0.0"
@@ -60,5 +61,6 @@
   },
   "engines": {
     "node": ">=18.0.0"
-  }
+  },
+  "packageManager": "pnpm@10.33.0"
 }
